@@ -1,0 +1,23 @@
+{
+  "name": "@momocode/s3-backed-object",
+  "version": "1.0.0",
+  "description": "Encapsulates an S3-backed object that is also cached in memory",
+  "main": "index.js",
+  "repository": "https://github.com/momocode/s3-backed-object",
+  "author": "Momocode Ltd",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha test/*.js"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.437.0",
+    "chai-spies": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.2"
+  }
+}
