@@ -18,7 +18,7 @@ class S3Object {
         Key: this.key
       }
       if (this.cached)
-        opts.ETag = this.cached.ETag
+        opts.IfNoneMatch = this.cached.ETag
       data = await this._s3.getObject(opts).promise()
     } catch (err) {
       if (err.statusCode === 404)

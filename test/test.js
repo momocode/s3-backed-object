@@ -10,6 +10,7 @@ describe('s3-backed-object', () => {
       const s3 = chai.spy.interface({
         getObject: () => ({
           promise: () => Promise.resolve({
+            ETag: 'etag',
             Body: Buffer.from(JSON.stringify({a: 'property'}))
           })
         })
@@ -28,9 +29,9 @@ describe('s3-backed-object', () => {
     })
     it('should keep object in memory and use ETag to check for modification', async () => {
       const s3 = chai.spy.interface({
-        getObject: ({ETag}) => ({
+        getObject: ({IfNoneMatch}) => ({
           promise: async () => {
-            if (ETag === 'etag')
+            if (IfNoneMatch === 'etag')
               throw awserror({statusCode: 304})
             return {
               Body: Buffer.from(JSON.stringify({a: 'property'})),
@@ -49,7 +50,7 @@ describe('s3-backed-object', () => {
       expect(s3.getObject).second.called.with({
         Bucket: 'bucket',
         Key: 'key',
-        ETag: 'etag'
+        IfNoneMatch: 'etag'
       })
     })
   })
@@ -72,9 +73,9 @@ describe('s3-backed-object', () => {
   describe('set/get', () => {
     it('set should cache object and get use ETag returned by putObject ', async () => {
       const s3 = chai.spy.interface({
-        getObject: ({ETag}) => ({
+        getObject: ({IfNoneMatch}) => ({
           promise: async () => {
-            if (ETag === 'etag')
+            if (IfNoneMatch === 'etag')
               throw awserror({statusCode: 304})
             return {
               Body: Buffer.from(JSON.stringify({a: 'property'})),
@@ -93,7 +94,7 @@ describe('s3-backed-object', () => {
       expect(s3.getObject).to.have.been.called.with({
         Bucket: 'bucket',
         Key: 'key',
-        ETag: 'etag'
+        IfNoneMatch: 'etag'
       })
     })
   })
