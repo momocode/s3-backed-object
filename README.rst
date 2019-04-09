@@ -12,7 +12,7 @@ Usage
 
 This module makes use of async/await and requires Node 8 at minimum to run.
 
-Both ``get`` and ``set`` return a ``Promise``. Any errors (expect 404 when
+Both ``get`` and ``set`` return a ``Promise``. Any errors (except 404 when
 getting, and 304 when not modified) from S3 are forwarded as-is.
 
 Basic usage::
