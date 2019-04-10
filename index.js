@@ -23,14 +23,14 @@ class S3Object {
     } catch (err) {
       if (err.statusCode === 404)
         return null
-      if (err.statusCode === 304)
-        return this.cached.data
+      if (this.cached && err.statusCode === 304)
+        return JSON.parse(this.cached.data)
       throw err
     }
     const obj = JSON.parse(data.Body)
     this.cached = {
       ETag: data.ETag,
-      data: obj
+      data: data.Body
     }
     return obj
   }
@@ -43,7 +43,7 @@ class S3Object {
     }).promise()
     this.cached = {
       ETag: response.ETag,
-      data: obj
+      data: JSON.stringify(obj)
     }
   }
 }

@@ -98,6 +98,52 @@ describe('s3-backed-object', () => {
       })
     })
   })
+  describe('object deep clone', () => {
+    it('modifications to obj after calling set(obj) should not be present in cache', async () => {
+      const s3 = chai.spy.interface({
+        getObject: ({IfNoneMatch}) => ({
+          promise: async () => {
+            if (IfNoneMatch === 'etag')
+              throw awserror({statusCode: 304})
+            throw new Error('unexpected call')
+          }
+        }),
+        putObject: () => ({
+          promise: async () => ({ETag: 'etag'})
+        })
+      })
+      const obj = new S3Object({bucket: 'bucket', key: 'key'}, undefined, {s3})
+      const instance = {prop: 'value', nested: { prop: 'value' }}
+      await obj.set(instance)
+      instance.prop = 'new value'
+      instance.nested.prop = 'new value'
+      expect(await obj.get()).to.deep.equal({prop: 'value', nested: {prop: 'value'}})
+    })
+    it('modifications to obj after obtaining it from get() should not be present in cache', async () => {
+      const s3 = chai.spy.interface({
+        getObject: ({IfNoneMatch}) => ({
+          promise: async () => {
+            if (IfNoneMatch === 'etag')
+              throw awserror({statusCode: 304})
+            return {
+              Body: Buffer.from(JSON.stringify({prop: 'value', nested: {prop: 'value'}})),
+              ETag: 'etag'
+            }
+          }
+        }),
+        putObject: () => ({
+          promise: async () => ({ETag: 'etag'})
+        })
+      })
+      const obj = new S3Object({bucket: 'bucket', key: 'key'}, undefined, {s3})
+      const instance = await obj.get()
+      expect(instance).to.deep.equal({prop: 'value', nested: {prop: 'value'}})
+      instance.prop = 'new value'
+      instance.nested.prop = 'new value'
+      expect(await obj.get()).to.deep.equal({prop: 'value', nested: {prop: 'value'}})
+      expect(s3.getObject).second.called.with({Bucket: 'bucket', Key: 'key', IfNoneMatch: 'etag'})
+    })
+  })
 })
 
 function awserror (props) {
