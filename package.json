@@ -1,6 +1,6 @@
 {
   "name": "@momocode/s3-backed-object",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Encapsulates an S3-backed object that is also cached in memory",
   "main": "index.js",
   "repository": "https://github.com/momocode/s3-backed-object",
